@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube 下載器</title>
+</head>
+<body>
+    <h2>YouTube 下載器</h2>
+    <input type="text" id="videoUrl" placeholder="輸入 YouTube 連結">
+    <button onclick="download('mp4')">下載影片 (MP4)</button>
+    <button onclick="download('mp3')">下載音訊 (MP3)</button>
+    <p id="status"></p>
+
+    <script>
+        async function download(format) {
+            const url = document.getElementById("videoUrl").value;
+            if (!url) {
+                alert("請輸入 YouTube 影片網址");
+                return;
+            }
+
+            document.getElementById("status").innerText = "下載中，請稍候...";
+
+            try {
+                const response = await fetch("https://你的-Railway-網址/download", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: url, format: format })
+                });
+
+                if (!response.ok) {
+                    throw new Error("下載失敗");
+                }
+
+                const blob = await response.blob();
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `download.${format}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                document.getElementById("status").innerText = "下載成功！";
+            } catch (error) {
+                document.getElementById("status").innerText = "下載失敗：" + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
